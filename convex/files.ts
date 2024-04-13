@@ -52,7 +52,7 @@ export const createFile = mutation({
             throw new ConvexError("You must be a member of the organization to upload a file");
         }
 
-        await ctx.db.insert("files", { name: args.name, orgId: args.orgId, fileId: args.fileId, type: args.type });
+        await ctx.db.insert("files", { name: args.name, orgId: args.orgId, fileId: args.fileId, type: args.type, userId: hasAccess.user._id, });
     },
 });
 
