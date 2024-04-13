@@ -2,7 +2,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Doc, Id } from "../../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { DeleteIcon, FileTextIcon, GanttChartIcon, ImageIcon, MoreVertical, TextIcon, TrashIcon } from "lucide-react";
+import { DeleteIcon, FileTextIcon, GanttChartIcon, ImageIcon, MoreVertical, StarIcon, TextIcon, TrashIcon } from "lucide-react";
 import { AlertDialogHeader, AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { ReactNode, useState } from "react";
@@ -14,6 +14,7 @@ import Image from "next/image";
 
 function FileCardActions({ file }: { file: Doc<"files"> }) {
     const deleteFile = useMutation(api.files.deleteFile);
+    const toggleFavorite = useMutation(api.files.toggleFavorite);
     const { toast } = useToast();
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     return (
@@ -45,9 +46,18 @@ function FileCardActions({ file }: { file: Doc<"files"> }) {
             <DropdownMenu>
                 <DropdownMenuTrigger><MoreVertical /></DropdownMenuTrigger>
                 <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => {
+                        toggleFavorite({
+                            fileId: file._id,
+                        })
+                    }} className="flex gap-1 items-center cursor-pointer">
+                        <StarIcon className="h-4 w-4" /> Favorite
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setIsConfirmOpen(true)} className="flex gap-1 text-red-600 items-center cursor-pointer">
                         <TrashIcon className="h-4 w-4" /> Delete
                     </DropdownMenuItem>
+
                 </DropdownMenuContent>
             </DropdownMenu>
         </>
@@ -72,7 +82,7 @@ export function FileCard({ file }: { file: Doc<"files"> }) {
                 <CardTitle className="flex gap-2">
                     <div className="flex justify-center">{typesIcons[file.type]}</div>
                     {file.name}
-                    </CardTitle>
+                </CardTitle>
                 <div className="absolute top-2 right-2"><FileCardActions file={file} /></div>
                 {/* <CardDescription>Card Description</CardDescription> */}
             </CardHeader>
