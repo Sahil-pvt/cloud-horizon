@@ -115,55 +115,57 @@ export function UploadButton() {
   const createFile = useMutation(api.files.createFile);
 
   return (
-        <Dialog open={isFileDialogOpen} onOpenChange={(isOpen) => {
-          setIsFileDialogOpen(isOpen);
-          form.reset();
-        }}>
-          <DialogTrigger asChild>
-            <Button>Upload File</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="mb-8">Upload Your File Here</DialogTitle>
-              <DialogDescription>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                    <FormField
-                      control={form.control}
-                      name="title"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Title</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Title" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="file"
-                      render={() => (
-                        <FormItem>
-                          <FormLabel>File</FormLabel>
-                          <FormControl>
-                            <Input type="file" {...fileRef} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button type="submit"
-                      disabled={form.formState.isSubmitting}
-                      className="flex gap-1">
-                      {form.formState.isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                      Submit</Button>
-                  </form>
-                </Form>
-              </DialogDescription>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
+    <Dialog open={isFileDialogOpen} onOpenChange={(isOpen) => {
+      setIsFileDialogOpen(isOpen);
+      form.reset();
+    }}>
+      <DialogTrigger asChild>
+        <Button>Upload File</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="mb-8">Upload Your File Here</DialogTitle>
+          <DialogDescription>
+            <div>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Title</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Title" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="file"
+                    render={() => (
+                      <FormItem>
+                        <FormLabel>File</FormLabel>
+                        <FormControl>
+                          <Input type="file" {...fileRef} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit"
+                    disabled={form.formState.isSubmitting}
+                    className="flex gap-1">
+                    {form.formState.isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                    Submit</Button>
+                </form>
+              </Form>
+            </div>
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
   )
 }
