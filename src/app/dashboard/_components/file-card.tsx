@@ -2,7 +2,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Doc, Id } from "../../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { DeleteIcon, FileTextIcon, GanttChartIcon, ImageIcon, MoreVertical, StarHalf, StarIcon, TextIcon, TrashIcon } from "lucide-react";
+import { DeleteIcon, FileTextIcon, GanttChartIcon, ImageIcon, MoreVertical, StarHalf, StarIcon, TextIcon, TrashIcon, UndoIcon } from "lucide-react";
 import { AlertDialogHeader, AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { ReactNode, useState } from "react";
@@ -15,6 +15,7 @@ import { Protect } from "@clerk/nextjs";
 
 function FileCardActions({ file, isFavorited }: { file: Doc<"files">; isFavorited: boolean; }) {
     const deleteFile = useMutation(api.files.deleteFile);
+    const restoreFile = useMutation(api.files.restoreFile);
     const toggleFavorite = useMutation(api.files.toggleFavorite);
     const { toast } = useToast();
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -23,9 +24,9 @@ function FileCardActions({ file, isFavorited }: { file: Doc<"files">; isFavorite
             <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete File?</AlertDialogTitle>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete this file?
+                            This action will mark the file for deletion process. Files are deleted periodically.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -36,8 +37,8 @@ function FileCardActions({ file, isFavorited }: { file: Doc<"files">; isFavorite
                             });
                             toast({
                                 variant: "default",
-                                title: "File deleted",
-                                description: "Your file is now gone from the system.",
+                                title: "File marked for deletion",
+                                description: "Your file will be deleted soon.",
                             });
                         }}>Continue</AlertDialogAction>
                     </AlertDialogFooter>
@@ -64,8 +65,21 @@ function FileCardActions({ file, isFavorited }: { file: Doc<"files">; isFavorite
                         role="org:admin"
                         fallback={<></>}>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => setIsConfirmOpen(true)} className="flex gap-1 text-red-600 items-center cursor-pointer">
-                            <TrashIcon className="h-4 w-4" /> Delete
+                        <DropdownMenuItem onClick={() => {
+                            if (file.shouldDelete) {
+                                restoreFile({
+                                    fileId: file._id,
+                                })
+                            } else {
+                                setIsConfirmOpen(true)
+                            }
+                        }} className="flex gap-1 items-center cursor-pointer">
+                            {file.shouldDelete ? <div className="flex gap-1 text-green-600 items-center cursor-pointer">
+                                <UndoIcon className="h-4 w-4" /> Restore
+                            </div> : <div className="flex gap-1 text-red-600 items-center cursor-pointer">
+                                <TrashIcon className="h-4 w-4" /> Delete
+                            </div>
+                            }
                         </DropdownMenuItem>
                     </Protect>
                 </DropdownMenuContent>
