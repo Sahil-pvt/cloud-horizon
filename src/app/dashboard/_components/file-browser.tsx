@@ -47,6 +47,13 @@ export function FilesBrowser({ title, favoritesOnly, deletedOnly, }: { title: st
 
   const files = useQuery(api.files.getFiles, orgId ? { orgId, query, favorites: favoritesOnly, deletedOnly } : 'skip');
   const isLoading = files === undefined;
+  const modifiedFiles =
+    files?.map((file) => ({
+      ...file,
+      isFavorited: (favorites ?? []).some(
+        (favorite) => favorite.fileId === file._id
+      ),
+    })) ?? [];
 
   return (
     <div>
@@ -74,9 +81,14 @@ export function FilesBrowser({ title, favoritesOnly, deletedOnly, }: { title: st
 
           {/* <DataTable columns={columns} data={files} /> */}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+          {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
             {files?.map((file) => {
               return <FileCard favorites={favorites ?? []} key={file._id} file={file} />
+            })}
+          </div> */}
+          <div className="grid grid-cols-3 gap-4">
+            {modifiedFiles?.map((file) => {
+              return <FileCard key={file._id} file={file} />;
             })}
           </div>
         </>
