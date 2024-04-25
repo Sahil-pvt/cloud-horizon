@@ -88,7 +88,7 @@ export function FileCardActions({
                         }}
                         className="flex gap-1 items-center cursor-pointer"
                     >
-                        <FileIcon className="w-4 h-4" /> Download
+                        <FileIcon className="w-4 h-4" /> Open/Download
                     </DropdownMenuItem>
 
                     <DropdownMenuItem

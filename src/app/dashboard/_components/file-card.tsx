@@ -13,8 +13,7 @@ import { FileTextIcon, GanttChartIcon, ImageIcon } from "lucide-react";
 import { ReactNode } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
-import Image from "next/image";
-  import { FileCardActions } from "./file-actions";
+import { FileCardActions } from "./file-actions";
 
 
 
@@ -45,10 +44,7 @@ export function FileCard({
                 </div>
             </CardHeader>
             <CardContent className="h-[200px] flex justify-center items-center">
-                {file.type === "image" && file.url && (
-                    <Image alt={file.name} width="200" height="100" src={file.url} />
-                )}
-
+                {file.type === "image" && <ImageIcon className="w-20 h-20" />}
                 {file.type === "csv" && <GanttChartIcon className="w-20 h-20" />}
                 {file.type === "pdf" && <FileTextIcon className="w-20 h-20" />}
             </CardContent>
