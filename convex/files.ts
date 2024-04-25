@@ -2,7 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { MutationCtx, QueryCtx, internalMutation, mutation, query } from "../convex/_generated/server";
 import { getUser } from "./users";
 import { fileTypes } from "./schema";
-import { Id } from "./_generated/dataModel";
+import { Doc, Id } from "./_generated/dataModel";
 
 
 export const generateUploadUrl = mutation(async (ctx) => {
@@ -112,22 +112,30 @@ export const deleteAllFiles = internalMutation({
     },
 });
 
+function assertCanDeleteFile(user: Doc<"users">, file: Doc<"files">) {
+    const canDelete =
+        file.userId === user._id ||
+        user.orgIds.find((org) => org.orgId === file.orgId)?.role === "admin";
+
+    if (!canDelete) {
+        throw new ConvexError("you have no access to delete this file");
+    }
+}
+
 export const deleteFile = mutation({
     args: { fileId: v.id("files") },
     async handler(ctx, args) {
         const access = await hasAccessToFile(ctx, args.fileId);
 
         if (!access) {
-            throw new ConvexError("No access to file");
+            throw new ConvexError("no access to file");
         }
 
-        const isAdmin = access.user.orgIds.find(org => org.orgId === access.file.orgId)?.role === "admin";
+        assertCanDeleteFile(access.user, access.file);
 
-        if (!isAdmin) {
-            throw new ConvexError("You have no admin access to delete");
-        }
-
-        await ctx.db.patch(args.fileId, { shouldDelete: true });
+        await ctx.db.patch(args.fileId, {
+            shouldDelete: true,
+        });
     },
 });
 
@@ -156,21 +164,31 @@ export const toggleFavorite = mutation({
         const access = await hasAccessToFile(ctx, args.fileId);
 
         if (!access) {
-            throw new ConvexError("No access to file");
+            throw new ConvexError("no access to file");
         }
 
-        const favorite = await ctx.db.query("favorites")
-            .withIndex('by_userId_orgId_fileId', (q) =>
-                q.eq('userId', access.user._id).eq("orgId", access.file.orgId).eq("fileId", access.file._id)
-            ).first();
+        const favorite = await ctx.db
+            .query("favorites")
+            .withIndex("by_userId_orgId_fileId", (q) =>
+                q
+                    .eq("userId", access.user._id)
+                    .eq("orgId", access.file.orgId)
+                    .eq("fileId", access.file._id)
+            )
+            .first();
 
         if (!favorite) {
-            await ctx.db.insert("favorites", { userId: access.user._id, orgId: access.file.orgId, fileId: access.file._id });
+            await ctx.db.insert("favorites", {
+                fileId: access.file._id,
+                userId: access.user._id,
+                orgId: access.file.orgId,
+            });
         } else {
             await ctx.db.delete(favorite._id);
         }
     },
 });
+
 
 export const getAllFavorites = query({
     args: { orgId: v.string(), },

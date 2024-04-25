@@ -6,11 +6,9 @@ import { api } from "../../../../convex/_generated/api";
 import { UploadButton } from "./upload-button";
 import { FileCard } from "./file-card";
 import Image from "next/image";
-import { FileIcon, Loader2, StarIcon } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { SearchBar } from "./search-bar";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 function Placeholder() {
   return (
@@ -52,35 +50,37 @@ export function FilesBrowser({ title, favoritesOnly, deletedOnly, }: { title: st
 
   return (
     <div>
-          {isLoading && <div className="flex flex-col gap-8 w-full items-center mt-24">
-            <Loader2 className="w-24 h-24 mx-auto animate-spin text-gray-500" />
-            <div className="text-2xl" >Loading you files...</div>
-          </div>}
+      {isLoading && <div className="flex flex-col gap-8 w-full items-center mt-24">
+        <Loader2 className="w-24 h-24 mx-auto animate-spin text-gray-500" />
+        <div className="text-2xl" >Loading you files...</div>
+      </div>}
 
-          {/* {!isLoading && !query && files.length === 0 && (
+      {/* {!isLoading && !query && files.length === 0 && (
         <Placeholder />
       )} */}
 
-          {!isLoading && (
-            <>
-              <div className="flex justify-between items-center mb-8">
-                <h1 className="text-4xl font-bold">{title}</h1>
+      {!isLoading && (
+        <>
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-4xl font-bold">{title}</h1>
 
-                <SearchBar query={query} setQuery={setQuery} />
-                <UploadButton />
-              </div>
+            <SearchBar query={query} setQuery={setQuery} />
+            <UploadButton />
+          </div>
 
-              {files.length === 0 && (
-                <Placeholder />
-              )}
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
-                {files?.map(file => {
-                  return <FileCard favorites={favorites ?? []} key={file._id} file={file} />
-                })}
-              </div>
-            </>
+          {files.length === 0 && (
+            <Placeholder />
           )}
-        </div>
+
+          {/* <DataTable columns={columns} data={files} /> */}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+            {files?.map((file) => {
+              return <FileCard favorites={favorites ?? []} key={file._id} file={file} />
+            })}
+          </div>
+        </>
+      )}
+    </div>
   );
 }
